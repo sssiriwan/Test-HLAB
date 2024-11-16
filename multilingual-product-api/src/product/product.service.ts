@@ -21,11 +21,26 @@ export class ProductService {
   }
 
   async searchProductByName(language: string, name: string, page: number, limit: number) {
-    const [products, total] = await this.translationRepository.findAndCount({
+    const [translations, total] = await this.translationRepository.findAndCount({
       where: { language, name: ILike(`%${name}%`) },
       skip: (page - 1) * limit,
       take: limit,
+      relations: ['product'], 
     });
+    const products = await Promise.all(translations.map(async (translation) => {
+      const product = await this.productRepository.findOne({
+        where: { id: translation.product.id },
+        relations: ['translations'], 
+      });
+  
+      return {
+        productId: translation.product.id,
+        translations: product.translations,  
+      };
+    }));
+  
     return { products, total };
   }
+  
+  
 }
