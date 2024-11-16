@@ -1,73 +1,144 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+## คำแนะนำในการรันโปรเจคและทดสอบ
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
+## การตั้งค่าระบบ
+### 1. Clone โปรเจคจาก Git Repository
+### 2. ติดตั้ง Dependencies
+```bash
+  npm install
+```
+### 3. ตั้งค่าฐานข้อมูล
+- ใช้ PostgreSQL ดาวน์โหลดและติดตั้ง PostgreSQL หลังติดตั้งเสร็จ ให้สร้างฐานข้อมูล:
+```sql
+CREATE DATABASE multilingual_products;
+```
+- ตั้งค่าการเชื่อมต่อในไฟล์ src/app.module.ts:
+```typescript
+TypeOrmModule.forRoot({
+  type: 'postgres',
+  host: 'localhost',
+  port: 5432,
+  username: 'your_username', 
+  password: 'your_password', 
+  database: 'multilingual_products',
+  autoLoadEntities: true, 
+  synchronize: true, 
+}),
+```
+### 4. รันโปรเจค
 
 ```bash
-$ npm install
+npm run start
 ```
-
-## Running the app
+## การรัน Test
+- Unit Test
+ทดสอบเฉพาะฟังก์ชันและบริการ:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm run test
 ```
 
-## Test
+- Integration Test
+ทดสอบการทำงานร่วมกันระหว่าง Controller และ Service:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run test:e2e
 ```
 
-## Support
+## การออกแบบฐานข้อมูล
+### 1. ตาราง products: เก็บข้อมูลสินค้าแต่ละรายการ
+      - id (Primary Key)
+      - ความสัมพันธ์แบบ One-to-Many กับ product_translations
+### 2. ตาราง product_translations: เก็บข้อมูลคำแปลของสินค้า
+      - id (Primary Key)
+      - language: ภาษา (เช่น en, th)
+      - name: ชื่อสินค้าในภาษานั้น ๆ
+      - description: คำอธิบายสินค้า
+      - ความสัมพันธ์แบบ Many-to-One กับ products
+*ใช้ TypeORM: เพื่อช่วยจัดการ Entity และความสัมพันธ์ในฐานข้อมูลอย่างมีประสิทธิภาพ
+### Multilingual Support
+การแยกข้อมูลคำแปลออกมาในตาราง product_translations ช่วยให้สามารถรองรับหลายภาษาได้โดยไม่ทำให้โครงสร้างของ products ซับซ้อน และช่วยลดการจัดเก็บข้อมูลที่ซ้ำซ้อน
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## การ Validate ข้อมูล: Validation ใน API
 
-## Stay in touch
+### 1.API: Create a Multilingual Product
+- ตรวจสอบว่าข้อมูล translations มีอย่างน้อย 1 รายการ
+- ตรวจสอบว่า language และ name ในแต่ละ translation ไม่เป็นค่าว่าง
+- ตรวจสอบว่า description มีความยาวอยู่ระหว่าง 5 ถึง 255 ตัวอักษร หากมีการกรอก
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### 2.API: Multilingual Product Search
+- ตรวจสอบว่าชื่อ (name) และภาษาที่ใช้ค้นหา (language) ถูกต้อง
+- ตรวจสอบค่าของ page และ limit ว่าเป็นตัวเลขบวก
 
-## License
+### 3.การจัดการ Error
+-หากข้อมูลไม่ผ่านการตรวจสอบ จะส่ง BadRequestException พร้อมข้อความแสดงข้อผิดพลาดที่ชัดเจนกลับไปยังผู้ใช้งาน
 
-Nest is [MIT licensed](LICENSE).
+
+## Testing Strategy
+ใช้ Jest สำหรับการทดสอบ
+Jest ช่วยให้สามารถเขียนและจัดการ Unit Test และ Integration Test ได้อย่างมีประสิทธิภาพ
+
+### 1. Unit Test
+
+- ทดสอบแต่ละฟังก์ชันใน ProductService เพื่อให้มั่นใจว่าการทำงานถูกต้อง
+- ใช้ Mock Repository ในการจำลองการทำงานของฐานข้อมูล
+
+### 2. Integration Test
+
+- ทดสอบการทำงานระหว่าง ProductController และ ProductService
+- ทดสอบ API Endpoint ว่าสามารถส่งข้อมูลและรับค่ากลับมาได้ถูกต้อง
+
+### 3. End-to-End Test
+
+- ทดสอบการทำงานของระบบทั้งหมดตั้งแต่การรับข้อมูลจาก API ไปจนถึงการจัดเก็บในฐานข้อมูล
+- ใช้ฐานข้อมูลชั่วคราวสำหรับการทดสอบ เพื่อให้มั่นใจว่าการทดสอบไม่กระทบข้อมูลจริง
+
+
+## ตัวอย่างคำสั่งในการทดสอบ
+ทดสอบ API ด้วย Postman
+- Create a Multilingual Product API
+```json
+POST http://localhost:3000/products
+Body: 
+[
+  {
+    "language": "en",
+    "name": "Laptop",
+    "description": "High performance laptop"
+  },
+  {
+    "language": "th",
+    "name": "แล็ปท็อป",
+    "description": "แล็ปท็อปประสิทธิภาพสูง"
+  }
+]
+```
+- Multilingual Product Search API
+
+```json
+GET http://localhost:3000/products/search?name=Laptop&page=1&limit=10
+```
+response
+```json
+{
+    "products": [
+        {
+            "productId": 3,
+            "translations": [
+                {
+                    "id": 25,
+                    "language": "en",
+                    "name": "Laptop",
+                    "description": "High performance laptop"
+                },
+                {
+                    "id": 26,
+                    "language": "th",
+                    "name": "แล็ปท็อป",
+                    "description": "แล็ปท็อปประสิทธิภาพสูง"
+                }
+            ]
+        }
+    ],
+    "total": 1
+}
+```
