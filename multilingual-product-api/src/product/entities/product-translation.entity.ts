@@ -12,7 +12,7 @@ export class ProductTranslation {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
   @ManyToOne(() => Product, (product) => product.translations)
