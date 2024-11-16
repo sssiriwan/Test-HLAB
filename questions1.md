@@ -17,7 +17,7 @@
 
 ### REST API
 - สร้าง endpoint ใหม่ เช่น `/aggregated-data` เพื่อรับคำขอ
-- Endpoint นี้จะดึงข้อมูลจากระบบกลางที่รวมข้อมูลแล้ว
+- Endpoint นี้จะดึงข้อมูลจากระบบกลางที่รวมข้อมูลทั้ง 3 ไมโครเซอร์วิส
 
 ### API Design
 #### 3.1 Endpoint Structure
@@ -40,9 +40,9 @@ GET /aggregated-data?customerId=123&from=2023-01-01&to=2023-12-31
 ```
 ## เทคโนโลยีที่อาจใช้:
 
-Message Broker: Kafka สำหรับการส่งรับสัญญาณระหว่างไมโครเซอร์วิส
-Data Stream Processing: Kafka Streams สำหรับประมวลผลสัญญาณแบบเรียลไทม์
-Caching: Redis สำหรับเก็บข้อมูลที่รวมแล้ว
+- Message Broker: Kafka สำหรับการส่งรับสัญญาณระหว่างไมโครเซอร์วิส
+- Data Stream Processing: Kafka Streams สำหรับประมวลผลสัญญาณแบบเรียลไทม์
+- Caching: Redis สำหรับเก็บข้อมูลที่รวมแล้ว
 
 ## สรุป:
 
